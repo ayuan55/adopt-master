@@ -14,6 +14,9 @@
     <!--包扫描，该包下的所有类以及所有子包下的所有类都支持注解-->
     <context:component-scan base-package="club.service"/>
 
+
+    <context:component-scan base-package="club"/>
+
     <!--读取连接数据库的properties文件-->
     <context:property-placeholder location="classpath:database.properties"/>
 

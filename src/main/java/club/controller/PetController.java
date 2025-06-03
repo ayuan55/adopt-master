@@ -1,5 +1,10 @@
 package club.controller;
 
+import club.command.Command;
+import club.command.CommandInvoker;
+import club.command.impl.CreatePetCommand;
+import club.command.impl.DeletePetCommand;
+import club.command.impl.UpdatePetCommand;
 import club.pojo.Pet;
 import club.service.PetService;
 import club.util.Message;
@@ -83,6 +88,52 @@ public class PetController {
         }else {
             return Message.fail();
         }
+    }
+
+
+
+
+    @RequestMapping("/createWithCommand")
+    @ResponseBody
+    public Message addWithCommand(Pet pet, MultipartFile file) {
+        String pic = FileLoad.uploadPetPic(file);
+        pet.setPic(pic);
+
+        CommandInvoker invoker = new CommandInvoker();
+        Command createCommand = new CreatePetCommand(petService, pet);
+        invoker.setCommand(createCommand);
+        invoker.executeCommand();
+
+        return Message.success();
+    }
+
+
+    @RequestMapping("/updateWithCommand")
+    @ResponseBody
+    public Message updateWithCommand(Pet pet, MultipartFile file) {
+        if (file != null && file.getSize() > 0) {
+            String pic = FileLoad.uploadPetPic(file);
+            pet.setPic(pic);
+        }
+
+        // 这里使用命令模式进行更新操作
+        CommandInvoker invoker = new CommandInvoker();
+        Command updateCommand = new UpdatePetCommand(petService, pet);
+        invoker.setCommand(updateCommand);
+        invoker.executeCommand();
+
+        return Message.success();
+    }
+
+    @RequestMapping("/deleteWithCommand")
+    @ResponseBody
+    public Message delWithCommand(Integer id) {
+        CommandInvoker invoker = new CommandInvoker();
+        Command deleteCommand = new DeletePetCommand(petService, id);
+        invoker.setCommand(deleteCommand);
+        invoker.executeCommand();
+
+        return Message.success();
     }
 
 }

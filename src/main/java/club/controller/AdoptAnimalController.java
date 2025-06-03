@@ -1,5 +1,8 @@
 package club.controller;
 
+import club.command.Command;
+import club.command.CommandInvoker;
+import club.command.impl.SubmitAdoptionCommand;
 import club.pojo.AdoptAnimal;
 import club.pojo.Pet;
 import club.pojo.User;
@@ -89,5 +92,28 @@ public class AdoptAnimalController {
             return Message.success();
         }
         return Message.fail();
+    }
+
+
+
+    @RequestMapping("/createWithCommand")
+    @ResponseBody
+    public Message createWithCommand(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        Pet pet = (Pet) session.getAttribute("pet");
+        pet.setState(1);
+
+        AdoptAnimal adoptAnimal = new AdoptAnimal();
+        adoptAnimal.setUserId(user.getId());
+        adoptAnimal.setPetId(pet.getId());
+        adoptAnimal.setAdoptTime(new Date());
+        adoptAnimal.setState(1);
+
+        CommandInvoker invoker = new CommandInvoker();
+        Command submitCommand = new SubmitAdoptionCommand(adoptAnimalService, adoptAnimal);
+        invoker.setCommand(submitCommand);
+        invoker.executeCommand();
+
+        return Message.success();
     }
 }
